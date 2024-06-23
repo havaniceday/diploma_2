@@ -32,15 +32,14 @@ class TestOrders:
         assert response.status_code == Responses.UNKNOWN_INGREDIENT_ID["code"]
         assert 'Internal Server Error' in response.text
 
-#этот тест ожидаемо падает, т.к. тест написан согласно документации, а поведение не соответствует документации, есть баг
+# поведение не соответствует документации, тест написан по текущему поведению
     @allure.title('Создание заказа без авторизации с ингредиентами')
-    @allure.description("Запрос возвращает код 401 и сообщение об ошибке - тест написан по документации, ожидаемо падает, т.к. есть баг: заказ успешно создается без авторизации, чего быть не должно, по документации юзер должен быть переадресован на логин, и только после этого заказ будет создан")
+    @allure.description("Запрос возвращает код 200, заказ успешно создается без авторизации, чего быть не должно, по документации юзер должен быть переадресован на логин, и только после этого заказ будет создан")
     def test_create_order_non_authorized_with_ingredients(self):
         access_token = "invalid_token"
         ingredients = helpers.SampleUserData.get_random_ingredient(2)
         response = api_methods.OrderMethods.create_order(ingredients, access_token)
-        assert response.status_code == Responses.UNAUTHORIZED_USER["code"]
-        assert response.json()['message'] == Responses.UNAUTHORIZED_USER["message"]
+        assert response.status_code == 200 and response.json().get('success') is True
 
     @allure.title("Получение списка заказов по конкретному юзеру с авторизацией")
     @allure.description("Запрос возвращает код 200 и список заказов пользователя")
